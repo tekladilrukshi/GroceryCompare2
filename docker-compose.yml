@@ -1,0 +1,30 @@
+# Local development infrastructure only — production uses Azure SQL Database
+# (architecture-plan.md §2). Start with: docker compose up -d
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: grocerycompare-sql
+    environment:
+      ACCEPT_EULA: "Y"
+      # Dev-only password; must match ConnectionStrings__GroceryCompare in
+      # src/GroceryCompare.Api/appsettings.Development.json
+      MSSQL_SA_PASSWORD: "LocalDev!Passw0rd"
+    ports:
+      # Host port 14330 (not 1433) to avoid clashing with any natively
+      # installed SQL Server instance on the developer machine
+      - "14330:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'LocalDev!Passw0rd' -Q 'SELECT 1' -b -o /dev/null",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  sqldata:

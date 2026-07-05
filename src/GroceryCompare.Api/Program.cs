@@ -1,6 +1,12 @@
+using GroceryCompare.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddDbContext<GroceryCompareDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("GroceryCompare")));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
