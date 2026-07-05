@@ -1,0 +1,59 @@
+name: .NET (API, Domain, Infrastructure, Scraper)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "!src/GroceryCompare.Web/**"
+      - "tests/**"
+      - "GroceryCompare.slnx"
+      - "dotnet-tools.json"
+      - ".github/workflows/dotnet.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "!src/GroceryCompare.Web/**"
+      - "tests/**"
+      - "GroceryCompare.slnx"
+      - "dotnet-tools.json"
+      - ".github/workflows/dotnet.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release -warnaserror
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --logger "trx" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: TestResults
+          if-no-files-found: ignore
+
+  # Deployment to Azure is intentionally a no-op until the infrastructure
+  # exists (PBI-005); this job marks where it will slot in.
+  deploy-stub:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder
+        run: echo "Deployment added once Azure resources exist (PBI-005)"
