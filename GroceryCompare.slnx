@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GroceryCompare.Api/GroceryCompare.Api.csproj" />
+    <Project Path="src/GroceryCompare.Domain/GroceryCompare.Domain.csproj" />
+    <Project Path="src/GroceryCompare.Infrastructure/GroceryCompare.Infrastructure.csproj" />
+    <Project Path="src/GroceryCompare.Scraper/GroceryCompare.Scraper.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GroceryCompare.Api.Tests/GroceryCompare.Api.Tests.csproj" />
+    <Project Path="tests/GroceryCompare.Domain.Tests/GroceryCompare.Domain.Tests.csproj" />
+  </Folder>
+</Solution>

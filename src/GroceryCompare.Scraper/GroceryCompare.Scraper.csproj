@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-GroceryCompare.Scraper-2e814d92-9832-485d-b41b-e114701a9330</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GroceryCompare.Domain\GroceryCompare.Domain.csproj" />
+    <ProjectReference Include="..\GroceryCompare.Infrastructure\GroceryCompare.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
