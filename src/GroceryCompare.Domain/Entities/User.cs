@@ -14,4 +14,8 @@ public class User
     public DateTime CreatedAt { get; set; }
 
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+
+    public ICollection<UserStoreSelection> StoreSelections { get; set; } = [];
+
+    public ICollection<ShoppingList> ShoppingLists { get; set; } = [];
 }

@@ -6,28 +6,21 @@ namespace GroceryCompare.Infrastructure;
 public class GroceryCompareDbContext(DbContextOptions<GroceryCompareDbContext> options)
     : DbContext(options)
 {
-    // Remaining entities (stores, items, prices, lists) are added in PBI-010.
     public DbSet<User> Users => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Franchise> Franchises => Set<Franchise>();
+    public DbSet<Store> Stores => Set<Store>();
+    public DbSet<UserStoreSelection> UserStoreSelections => Set<UserStoreSelection>();
+    public DbSet<GroceryItem> GroceryItems => Set<GroceryItem>();
+    public DbSet<ItemAlias> ItemAliases => Set<ItemAlias>();
+    public DbSet<Price> Prices => Set<Price>();
+    public DbSet<ShoppingList> ShoppingLists => Set<ShoppingList>();
+    public DbSet<ShoppingListItem> ShoppingListItems => Set<ShoppingListItem>();
+    public DbSet<ScrapeRun> ScrapeRuns => Set<ScrapeRun>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>(user =>
-        {
-            user.Property(u => u.GoogleSubjectId).HasMaxLength(64);
-            user.Property(u => u.Email).HasMaxLength(320);
-            user.Property(u => u.DisplayName).HasMaxLength(200);
-            user.HasIndex(u => u.GoogleSubjectId).IsUnique();
-        });
-
-        modelBuilder.Entity<RefreshToken>(token =>
-        {
-            token.Property(t => t.TokenHash).HasMaxLength(64);
-            token.HasIndex(t => t.TokenHash).IsUnique();
-            token.HasOne(t => t.User)
-                .WithMany(u => u.RefreshTokens)
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
+        // Per-entity configuration classes live in Configurations/.
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(GroceryCompareDbContext).Assembly);
     }
 }
