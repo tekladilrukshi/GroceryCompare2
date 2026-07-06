@@ -91,6 +91,83 @@ public sealed class AuthServiceTests : IDisposable
         Assert.Empty(_db.RefreshTokens);
     }
 
+    [Fact]
+    public async Task Refresh_ActiveToken_RotatesAndReturnsNewTokens()
+    {
+        var service = CreateService(SamplePayload);
+        var signIn = await service.SignInWithGoogleAsync("valid-token");
+        Assert.NotNull(signIn);
+
+        var refreshed = await service.RefreshAsync(signIn.RefreshToken);
+
+        Assert.NotNull(refreshed);
+        Assert.NotEqual(signIn.RefreshToken, refreshed.RefreshToken);
+        var original = _db.RefreshTokens.Single(
+            t => t.TokenHash == _tokenService.HashRefreshToken(signIn.RefreshToken));
+        Assert.NotNull(original.RevokedAt);
+        Assert.Equal(2, _db.RefreshTokens.Count());
+    }
+
+    [Fact]
+    public async Task Refresh_RevokedToken_ReturnsNull()
+    {
+        var service = CreateService(SamplePayload);
+        var signIn = await service.SignInWithGoogleAsync("valid-token");
+        Assert.NotNull(signIn);
+        await service.RefreshAsync(signIn.RefreshToken);
+
+        var reused = await service.RefreshAsync(signIn.RefreshToken);
+
+        Assert.Null(reused);
+    }
+
+    [Fact]
+    public async Task Refresh_ExpiredToken_ReturnsNull()
+    {
+        var user = new User
+        {
+            GoogleSubjectId = SamplePayload.Subject,
+            Email = SamplePayload.Email,
+            DisplayName = SamplePayload.DisplayName,
+            CreatedAt = DateTime.UtcNow.AddDays(-60),
+        };
+        var expired = _tokenService.CreateRefreshToken();
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            User = user,
+            TokenHash = expired.TokenHash,
+            CreatedAt = DateTime.UtcNow.AddDays(-60),
+            ExpiresAt = DateTime.UtcNow.AddDays(-30),
+        });
+        await _db.SaveChangesAsync();
+
+        var result = await CreateService(SamplePayload).RefreshAsync(expired.RawToken);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task Logout_RevokesToken_SoRefreshFails()
+    {
+        var service = CreateService(SamplePayload);
+        var signIn = await service.SignInWithGoogleAsync("valid-token");
+        Assert.NotNull(signIn);
+
+        await service.LogoutAsync(signIn.RefreshToken);
+        var afterLogout = await service.RefreshAsync(signIn.RefreshToken);
+
+        Assert.Null(afterLogout);
+        Assert.NotNull(Assert.Single(_db.RefreshTokens).RevokedAt);
+    }
+
+    [Fact]
+    public async Task Logout_UnknownToken_IsIdempotentNoOp()
+    {
+        await CreateService(SamplePayload).LogoutAsync("never-issued-token");
+
+        Assert.Empty(_db.RefreshTokens);
+    }
+
     private sealed class FakeGoogleTokenValidator(GoogleTokenPayload? result) : IGoogleTokenValidator
     {
         public Task<GoogleTokenPayload?> ValidateAsync(
