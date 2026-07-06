@@ -9,9 +9,18 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- GHSA-2m69-gcr7-jv3q affects the native sqlite3 pulled in transitively by
+         Microsoft.Data.Sqlite 10 (no patched 2.x exists; 3.x is incompatible).
+         Test-only, in-memory database with trusted input — safe to suppress.
+         Remove once EF Core references a patched SQLitePCLRaw. -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
   </ItemGroup>
 
   <ItemGroup>
