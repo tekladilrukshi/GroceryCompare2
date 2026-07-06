@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="GroceryCompare.Scraper.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GroceryCompare.Domain\GroceryCompare.Domain.csproj" />
     <ProjectReference Include="..\GroceryCompare.Infrastructure\GroceryCompare.Infrastructure.csproj" />
   </ItemGroup>

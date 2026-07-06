@@ -8,5 +8,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/GroceryCompare.Api.Tests/GroceryCompare.Api.Tests.csproj" />
     <Project Path="tests/GroceryCompare.Domain.Tests/GroceryCompare.Domain.Tests.csproj" />
+    <Project Path="tests/GroceryCompare.Scraper.Tests/GroceryCompare.Scraper.Tests.csproj" />
   </Folder>
 </Solution>
